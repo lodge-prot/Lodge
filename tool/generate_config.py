@@ -1,4 +1,4 @@
-#!/usr/bin/python3.6
+#!/usr/local/bin/python3.7
 # -*- coding: utf-8 -*-
 # -*- mode: python;Encoding: utf8n -*-
 
@@ -7,17 +7,22 @@ import os
 import json
 import sys
 import datetime
+import pytest
 from time import sleep
 
-BASE_DIR    = "./text"
-ANS_DIR     = BASE_DIR + "/ans/"
-CONF_DIR    = BASE_DIR + "/conf/"
-PROB_DIR    = BASE_DIR + "/prob/"
-DIRECTORY_INFO = [BASE_DIR, ANS_DIR, CONF_DIR, PROB_DIR]
+if os.getenv('IS_DOCKER', default=0):
+    BASE_DIR  = "/Lodge"
+else:
+    BASE_DIR  = "./text"
+
+ANS_DIR         = BASE_DIR + "/ans/"
+CONF_DIR        = BASE_DIR + "/conf/"
+PROB_DIR        = BASE_DIR + "/prob/"
+DIRECTORY_INFO  = [BASE_DIR, ANS_DIR, CONF_DIR, PROB_DIR]
+DEFAULT_TIMEOUT = 20
 
 dirlist     = []
 dict_arr    = {}
-TIMEOUT     = 20
 
 class Timeout(Exception):
     pass
@@ -27,6 +32,10 @@ class ComplexEncoder(json.JSONEncoder):
         if isinstance(o, datetime):
             return o.isoformat()
         return super(ComplexEncoder, self).default(o)
+
+def test___is_exit():
+    i = __is_exit()
+    assert i == 0
 
 def do_kill_process(line):
     num = 0
@@ -40,12 +49,15 @@ def do_kill_process(line):
                 raise e
     return num
 
+# 間違いなくいらないファイルを消していく
 def do_kill_process(devfile):
     for i in dirlist:
         do_kill_process(line)
         sleep(1)
 
+# pytestで使う用
 def print_infomation(dic):
+    print ("PID      : " + dic['pid'])
     print ("FILENAME : " + dic['filename'])
     print ("FILENUM  : " + dic['filenum'])
 
@@ -85,14 +97,16 @@ def parse_to_json(d):
     json.dump(results, json_file)
 
     generate_info = {
+        'pid'      : str(os.getpid()),
         'filename' : os.path.basename(filename) ,
         'filenum'  : str(len(d))
     }
 
     print_infomation(generate_info)
 
-def __is_exit(dic):
-    print(dic.keys())
+def __is_exit():
+    #print(dic.keys())
+    return 0
 
 def do_run():
     get_problem_list(DIRECTORY_INFO[1])

@@ -1,4 +1,4 @@
-ifeq ($(shell uname),Darwin)
+ifeq ($(shell uname),Linux)
 	$(shell exit)
 endif
 
@@ -16,5 +16,5 @@ all:
 	$(CC)  $(CFLAGS) -o $(PROGRAM) $(TARGET)
 
 clean:
-	rm -f a.out flock_and_sort *.o
+	rm -rf a.out flock_and_sort *.o *.dSYM
 
