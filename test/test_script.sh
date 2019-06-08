@@ -1,54 +1,100 @@
 #!/bin/bash
 
-TXT_A="../text/q_001.txt"
-TXT_B="../text/q_002.txt"
-PY_CODE="../src/s002.py"
+################################################################
+#                                                              #
+# FileName: test_script.sh                                     #
+# Discription:                                                 #
+#    Execute test                                              #
+#                                                              #
+################################################################
+
+# Valiable
+# =========================================
+
+CONFIG_FILE="./test/test_script.conf"
 
 # Files check
-if [[ ! -f ${TXT_A} ]]; then
-    echo "[ERROR] File does not exist."
-    exit 1
+# =========================================
+
+if [[ ! -f ${CONFIG_FILE} ]]; then
+  echo "[ERROR] Not exist file. Pash: ${CONFIG_FILE}"
 fi
 
-if [[ ! -f ${TXT_B} ]]; then
-    echo "[ERROR] File does not exist."
-    exit 1
-fi
+# Load config file
+# =========================================
 
-if [[ ! -f ${PY_CODE} ]]; then
-    echo "[ERROR] File does not exist."
-    exit 1
-fi
+source ${CONFIG_FILE}
+
+
+# Parse test name from json config
+# =========================================
+
 
 
 # Function
-function python_test(){
-    PY_CMD="/usr/local/bin/python3.6 ${1} < ${2}"
+# =========================================
 
-    eval ${PY_CMD}
-    RC=$?
+function perse_json_config(){
+  PER_CONF_CMD=$( cat << EOS
+/usr/local/bin/python3.7 "${JSON_PAR_PATH}" \
+--config ${1} \
+--mode parse \
+--parse ${2}
+EOS
+)
 
-    if [[ ${DEBUG:-0} == 1 ]]; then
-        echo "[DEBUG] Following command. CMD: ${CMD}"
-    fi
+  eval "${PER_CONF_CMD}"
+  local RC=$?
 
-    if [[ ${RC} != 0 ]]; then
-        echo "[ERROR] Failed to python command. CMD: ${CMD}"
-        exit 1
-    fi
+  if [[ "${RC}" -ne 0 ]]; then
+    echo "[ERROR] Failed to execute command. Execute command: ${PER_CONF_CMD}"
+    exit 1
+  fi
+
+}
+
+
+
+function code_check(){
+  CCS_CMD=$( cat << EOS
+${CCS_FILE_PATH} \
+--src-code "${PY_CODE_PATH}/${1}" \
+--problem "${PROB_PATH}/${2}" \
+--answer "${ANS_PATH}/${2}"
+EOS
+)
+
+  eval "${CCS_CMD}"
+  local RC=$?
+
+  if [[ "${RC}" -ne 0 ]]; then
+    echo "[ERROR] Failed to execute command. Execute command: ${CCS_CMD}"
+    exit 1
+  fi
 
 }
 
 # MAIN
-RESULT_A=$(python_test ${PY_CODE} ${TXT_A})
-RESULT_B=$(python_test ${PY_CODE} ${TXT_B})
+# =========================================
 
-if [[ ${RESULT_A} != 2987654320 ]]; then
-    exit 1
-fi
+# ToDo: config file name check
+PER_NAME_LIST_CMD=$( cat << EOS
+/usr/local/bin/python3.7 "${JSON_PAR_PATH}" \
+--config ${TEST_CONF_PATH}/config.json \
+--mode name-list
+EOS
+)
 
-if [[ ${RESULT_B} != 120 ]]; then
-    exit 1
-fi
+TEST_LIST=$( eval "${PER_CONF_CMD}" )
+
+for TEST_NAME in "${TEST_LIST}"; do
+  ANS_PROB_FILE_NAME_LIST="$( perse_json_config ${TEST_NAME} )"
+
+  for ANS_PROB_FILE_NAME in "${ANS_PROB_FILE_NAME_LIST}" ; do
+    #ToDo: File type check
+    code_check "${TEST_NAME}.py" "${ANS_PROB_FILE_NAME}"
+  done
+
+done
 
 exit 0

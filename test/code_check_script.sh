@@ -24,12 +24,6 @@ Input option:
 EOS
 }
 
-# Logger function
-# ToDo: メインのほうで使用？
-# function logger(){
-#   echo "${1}" >> "${LOG_PATH}"
-# }
-
 # Argument check
 
 SCRIPT_NAME="$( basename $0 )"
