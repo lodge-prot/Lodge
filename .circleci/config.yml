@@ -13,18 +13,13 @@ commands:
   pip_install:
     description:
       "Installing for needed pip liblary."
-    parameters:
-      to:
-        type: string
-        default:
-          - pytest
-          - pytest-cov
     steps:
       - run: |
           python3 -m venv venv
           . venv/bin/activate
           pip install --upgrade pip
-          pip install << parameters.to >>
+          pip install pytest
+          pip install pytest-cov
   execute_test:
     description:
       "Execute for test script."
