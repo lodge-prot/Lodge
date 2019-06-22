@@ -24,6 +24,7 @@ fi
 # =========================================
 
 source ${CONFIG_FILE}
+PYTHON_PATH=$( which python3.7 )
 
 
 # Parse test name from json config
@@ -34,9 +35,39 @@ source ${CONFIG_FILE}
 # Function
 # =========================================
 
+function generatei_json_config(){
+  GEN_CONF_CMD=$( "${PYTHON_PATH}" "${JSON_GEN_PATH}" )
+
+  eval "${GEN_CONF_CMD}"
+  local RC=$?
+
+  if [[ "${RC}" -ne 0 ]]; then
+    echo "[ERROR] Failed to execute command. Execute command: ${GEN_CONF_CMD}"
+  fi
+
+}
+
+function perse_config_name(){
+  NAME_PER_CMD=$( cat << EOS
+/usr/local/bin/python3.7 "${JSON_PAR_PATH}" \
+--config ${TEST_CONF_PATH}/config.json \
+--mode name-list
+EOS
+)
+
+  eval "${NAME_PER_CMD}"
+  local RC=$?
+
+  if [[ "${RC}" -ne 0 ]]; then
+    echo "[ERROR] Failed to execute command. Execute command: ${NAME_PER_CMD}"
+    exit 1
+  fi
+
+}
+
 function perse_json_config(){
   PER_CONF_CMD=$( cat << EOS
-/usr/local/bin/python3.7 "${JSON_PAR_PATH}" \
+"${PYTHON_PATH}" "${JSON_PAR_PATH}" \
 --config ${1} \
 --mode parse \
 --parse ${2}
@@ -52,7 +83,6 @@ EOS
   fi
 
 }
-
 
 
 function code_check(){
@@ -78,12 +108,6 @@ EOS
 # =========================================
 
 # ToDo: config file name check
-PER_NAME_LIST_CMD=$( cat << EOS
-/usr/local/bin/python3.7 "${JSON_PAR_PATH}" \
---config ${TEST_CONF_PATH}/config.json \
---mode name-list
-EOS
-)
 
 TEST_LIST=$( eval "${PER_CONF_CMD}" )
 
