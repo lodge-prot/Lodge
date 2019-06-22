@@ -11,54 +11,43 @@ executors:
 
 commands:
   pip_install:
+    description:
+      "Installing for needed pip liblary."
+    parameters:
+      to:
+        type: string
+        default:
+          - pytest
+          - pytest-cov
     steps:
       - run: |
           python3 -m venv venv
           . venv/bin/activate
           pip install --upgrade pip
-          pip -V
-          pip install pytest
-          pip install pytest-cov
+          pip install << parameters.to >>
+  execute_test:
+    description:
+      "Execute for test script."
+    steps:
+      - run: |
+          . test/test_script.sh
 
 # ジョブ定義
 jobs:
   setup:
     executor:
-      name: default
+      default
     steps:
       - checkout
       - pip_install
-      - run:
-          name: Install Packages
-          command: |
-            mkdir -p ~/workspace
-            echo "Hello World > ~/workspace/bin"
-            ls -la ../
-      # ビルド/テストコンテナでのファイル共有
-      # - persist_to_workspace:
-      #     root: ~/workspace
-      #     paths:
-      #       - bin
   test:
     executor:
       default
     steps:
       - checkout
-      - run:
-          name: Test
-          command: |
-            python3 -m venv venv
-            . venv/bin/activate
-            pip install --upgrade pip
-            pip -V
-            pip install pytest
-            pip install pytest-cov
+      - execute_test
       - attach_workspace:
-          at: ~/workspace/bin
-      - run:
-          name: Echo File
-          command: |
-            cat ~/workspace/bin
+          at: ~/workspace
 workflows:
   setup_deploy:
     jobs:
