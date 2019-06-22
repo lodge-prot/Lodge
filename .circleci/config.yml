@@ -13,12 +13,12 @@ commands:
   pip_install:
     steps:
       - run: |
-        python3 -m venv venv
-        . venv/bin/activate
-        pip install --upgrade pip
-        pip -V
-        pip install pytest
-        pip install pytest-cov
+          python3 -m venv venv
+          . venv/bin/activate
+          pip install --upgrade pip
+          pip -V
+          pip install pytest
+          pip install pytest-cov
 
 # ジョブ定義
 jobs:
