@@ -7,8 +7,6 @@ import os
 import json
 import sys
 import datetime
-import pytest
-from time import sleep
 
 if os.getenv('IS_DOCKER', default=0):
     BASE_DIR  = "/Lodge"
@@ -57,6 +55,7 @@ def do_kill_process(devfile):
 
 # pytestで使う用
 def print_infomation(dic):
+    print ("Result Successfully.\n")
     print ("PID      : " + dic['pid'])
     print ("FILENAME : " + dic['filename'])
     print ("FILENUM  : " + dic['filenum'])
@@ -85,8 +84,10 @@ def parse_to_json(d):
             results[key] = []
         results[key].append(num)
 
+    # ファイルが存在するかを確認
     if __is_exit(results):
-        os.exit()
+        print ("Wrong file configurationi.")
+        sys.exit()
 
     # Conversion : dict => str
     json_str = json.dumps(results, cls=ComplexEncoder)
@@ -104,8 +105,14 @@ def parse_to_json(d):
 
     print_infomation(generate_info)
 
-def __is_exit():
-    #print(dic.keys())
+def __is_exit(r):
+    L =[]
+    for key in r:
+        for val in r[key]:
+            if os.path.exists('{}{}/{}'.format(PROB_DIR, key, val)):
+                continue
+            else:
+                return val
     return 0
 
 def do_run():
