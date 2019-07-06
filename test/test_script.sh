@@ -11,7 +11,7 @@
 # Valiable
 # =========================================
 
-CONFIG_FILE="../test/test_script.conf"
+CONFIG_FILE="./test/test_script.conf"
 
 # Files check
 # =========================================
