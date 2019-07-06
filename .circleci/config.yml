@@ -25,6 +25,7 @@ commands:
       "Execute for test script."
     steps:
       - run: |
+          python3 tool/generate_config.py
           . test/test_script.sh
 
 # ジョブ定義

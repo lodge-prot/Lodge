@@ -11,7 +11,7 @@
 # Valiable
 # =========================================
 
-CONFIG_FILE="./test/test_script.conf"
+CONFIG_FILE="../test/test_script.conf"
 
 # Files check
 # =========================================
@@ -24,8 +24,9 @@ fi
 # =========================================
 
 source ${CONFIG_FILE}
-PYTHON_PATH=$( which python3.7 )
+PYTHON_PATH=$( which python3.6 )
 
+TEST_CONF_FILE="${TEST_CONF_PATH}/$( ls -rt ${TEST_CONF_PATH} | tail -1 )"
 
 # Parse test name from json config
 # =========================================
@@ -49,8 +50,8 @@ function generatei_json_config(){
 
 function perse_config_name(){
   NAME_PER_CMD=$( cat << EOS
-/usr/local/bin/python3.7 "${JSON_PAR_PATH}" \
---config ${TEST_CONF_PATH}/config.json \
+"${PYTHON_PATH}" "${JSON_PAR_PATH}" \
+--config ${TEST_CONF_FILE} \
 --mode name-list
 EOS
 )
@@ -109,16 +110,22 @@ EOS
 
 # ToDo: config file name check
 
-TEST_LIST=$( eval "${PER_CONF_CMD}" )
+TEST_LIST=$( eval perse_config_name "${TEST_CONF_FILE}" )
 
-for TEST_NAME in "${TEST_LIST}"; do
-  ANS_PROB_FILE_NAME_LIST="$( perse_json_config ${TEST_NAME} )"
+while read TEST_NAME; do
+  ANS_PROB_FILE_NAME_LIST="$( perse_json_config "${TEST_CONF_FILE}" ${TEST_NAME} )"
 
-  for ANS_PROB_FILE_NAME in "${ANS_PROB_FILE_NAME_LIST}" ; do
+  while read ANS_PROB_FILE_NAME; do
     #ToDo: File type check
-    code_check "${TEST_NAME}.py" "${ANS_PROB_FILE_NAME}"
-  done
+    # Get Prefix
+    PREFIX="$(echo ${ANS_PROB_FILE_NAME} | awk -F'_' '{ print $2 }' )"
+    code_check "${TEST_NAME}_${PREFIX}.py" "${TEST_NAME}/${ANS_PROB_FILE_NAME}"
+  done << EOS
+${ANS_PROB_FILE_NAME_LIST}
+EOS
 
-done
+done << EOS
+${TEST_LIST}
+EOS
 
 exit 0
