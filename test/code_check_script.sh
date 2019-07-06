@@ -112,10 +112,16 @@ EXEC_RESULT=$( python_test ${SRC_FILE} ${PROPLEM_FILE} )
 
 ANS="$( cat ${ANSWER_FILE} )"
 if [[ ${EXEC_RESULT} != ${ANS} ]]; then
-    echo "[ERROR] Bad code result. RESULT: ${EXEC_RESULT}"
-    echo "Test File Name:    ${SRC_FILE}"
-    echo "Problem File Name: ${PROPLEM_FILE}"
-    echo "Answer File Name:  ${PROPLEM_FILE}"
+    cat << EOS
+[ERROR] Bad code result. RESULT: ${EXEC_RESULT}
+
+Test File Name:    ${SRC_FILE}
+Problem File Name: ${PROPLEM_FILE}
+Answer File Name:  ${PROPLEM_FILE}
+
+Recheck the code!
+Command: ${PY_CMD}
+EOS
     exit 1
 fi
 
