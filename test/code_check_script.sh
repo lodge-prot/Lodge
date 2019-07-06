@@ -102,6 +102,10 @@ function python_test(){
 
     if [[ ${RC} != 0 ]]; then
         echo "[ERROR] Failed to python command. Command: ${CMD}"
+         echo "Test File Name:    ${SRC_FILE}"
+         echo "Problem File Name: ${PROPLEM_FILE}"
+         echo "Answer File Name:  ${PROPLEM_FILE}"
+         exit 1
         exit 1
     fi
 
