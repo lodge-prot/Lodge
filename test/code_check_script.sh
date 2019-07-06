@@ -102,9 +102,6 @@ function python_test(){
 
     if [[ ${RC} != 0 ]]; then
         echo "[ERROR] Failed to python command. Command: ${CMD}"
-         echo "Test File Name:    ${SRC_FILE}"
-         echo "Problem File Name: ${PROPLEM_FILE}"
-         echo "Answer File Name:  ${PROPLEM_FILE}"
          exit 1
         exit 1
     fi
@@ -116,6 +113,9 @@ EXEC_RESULT=$( python_test ${SRC_FILE} ${PROPLEM_FILE} )
 ANS="$( cat ${ANSWER_FILE} )"
 if [[ ${EXEC_RESULT} != ${ANS} ]]; then
     echo "[ERROR] Bad code result. RESULT: ${EXEC_RESULT}"
+    echo "Test File Name:    ${SRC_FILE}"
+    echo "Problem File Name: ${PROPLEM_FILE}"
+    echo "Answer File Name:  ${PROPLEM_FILE}"
     exit 1
 fi
 
